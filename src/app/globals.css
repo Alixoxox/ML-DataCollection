@@ -83,12 +83,20 @@ body {
 }
 .skip-link {
   position: absolute; top: -40px; left: 0;
-  padding: 8px 16px; background: var(--color-primary);
-  color: #fff; font-weight: 600; text-decoration: none;
+  padding: 8px 16px;
+  font-weight: 600; text-decoration: none;
   border-radius: 0 0 var(--radius-sm) 0; z-index: 200;
   transition: top var(--transition);
+  /* invisible until keyboard-focused */
+  background: transparent;
+  color: transparent;
 }
-.skip-link:focus { top: 0; }
+.skip-link:focus {
+  top: 0;
+  background: var(--color-primary);
+  color: #fff;
+}
+
 
 /* ============================================================
    NAVBAR
