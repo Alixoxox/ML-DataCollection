@@ -4,7 +4,7 @@ import Navbar from '@/components/Navbar';
 import { FormProgressProvider } from '@/lib/FormProgressContext';
 
 export const metadata: Metadata = {
-  title: 'Voice Mood Recording for ML Research',
+  title: 'DataForge - Voice Mood Recording for ML Research',
   description:
     'Contribute to academic machine learning research by recording short voice clips and self-reporting your mood. Multilingual support: English, Urdu, Roman Urdu.',
   keywords: [
@@ -15,6 +15,20 @@ export const metadata: Metadata = {
     'speech emotion recognition',
     'urdu voice dataset',
     'NLP',
+    'Ned',
+    'Cis',
+    'DataForge',
+    'Voice Mood Recorder',
+    'Sentiment Analysis',
+    'Urdu Speech Dataset',
+    'Roman Urdu',
+    'AI Research',
+    'Emotion AI',
+    'Voice Data Collection',
+    'Machine Learning Research',
+    'Audio Dataset',
+    'Mental Health AI',
+    'Ned University'
   ],
   authors: [{ name: 'Academic ML Research Team' }],
   robots: { index: true, follow: true },
@@ -23,16 +37,16 @@ export const metadata: Metadata = {
     shortcut: '/icon.svg',
   },
   openGraph: {
-    title: 'Voice Mood Recording for ML Research',
+    title: 'DataForge - Voice Mood Recording for ML Research',
     description:
       'Record your voice while reading a neutral sentence and self-report your mood. Help build a multilingual emotion recognition dataset.',
     type: 'website',
     locale: 'en_US',
-    siteName: 'Voice Mood Recorder',
+    siteName: 'DataForge',
   },
   twitter: {
     card: 'summary',
-    title: 'Voice Mood Recording for ML Research',
+    title: 'DataForge - Voice Mood Recording for ML Research',
     description:
       'Contribute to academic ML research on mood detection. Record voice clips in English or Urdu.',
   },

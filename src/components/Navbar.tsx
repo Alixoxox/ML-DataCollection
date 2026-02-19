@@ -59,7 +59,7 @@ export default function Navbar() {
                 <Link href="/" className="navbar-brand" aria-label="Voice Mood Recorder Home">
                     <span className="navbar-logo" aria-hidden="true">🔬</span>
                     <div className="navbar-brand-text">
-                        <span className="navbar-title">VoiceMood</span>
+                        <span className="navbar-title">DataForge</span>
                         <span className="navbar-subtitle">ML Research</span>
                     </div>
                 </Link>

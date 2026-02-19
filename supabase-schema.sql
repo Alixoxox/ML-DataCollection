@@ -1,5 +1,5 @@
 -- ============================================================
--- Voice Mood Recorder — Supabase Schema Migration
+-- DataForge — Supabase Schema Migration
 -- Run this in your Supabase SQL Editor
 -- ============================================================
 
