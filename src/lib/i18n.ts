@@ -24,7 +24,7 @@ export const moodOptions: Record<LangKey, MoodOption[]> = {
     ],
     roman_urdu: [
         { value: 'calm', label: 'Calm (Pursukoon)' },
-        { value: 'stressed', label: 'Stressed (Dabaao)' },
+        { value: 'stressed', label: 'Stressed (Pareeshan)' },
         { value: 'happy', label: 'Happy (Khush)' },
         { value: 'sad', label: 'Sad (Udaas)' },
         { value: 'angry', label: 'Angry (Gussa)' },
@@ -32,7 +32,7 @@ export const moodOptions: Record<LangKey, MoodOption[]> = {
     ],
     urdu_script: [
         { value: 'calm', label: 'سکون (Calm)' },
-        { value: 'stressed', label: 'دباؤ (Stressed)' },
+        { value: 'stressed', label: 'پریشان (Stressed)' },
         { value: 'happy', label: 'خوش (Happy)' },
         { value: 'sad', label: 'اداس (Sad)' },
         { value: 'angry', label: 'غصہ (Angry)' },

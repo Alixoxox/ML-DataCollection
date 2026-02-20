@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
 
             // ── Upload to Supabase Storage ────────────────────────────────────
             const ext = audioFile.type.includes('ogg') ? 'ogg' : 'webm';
-            const fileName = `${language}/${sessionId}/rec_${i}_${Date.now()}.${ext}`;
+            const fileName = `raw/${language}/${mood}/rec_${i}_${Date.now()}.${ext}`;
 
             const arrayBuffer = await audioFile.arrayBuffer();
             const buffer = Buffer.from(arrayBuffer);

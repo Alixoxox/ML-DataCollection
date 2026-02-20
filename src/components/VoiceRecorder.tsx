@@ -4,7 +4,9 @@ import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { uiLabels, type LangKey } from '@/lib/i18n';
 
 const MIN_DURATION_SEC = 5;   // reject recordings shorter than this
+const MAX_DURATION_SEC = 30;  // auto-stop at this limit for consistent ML clips
 const MIN_BLOB_BYTES = 4096; // ~4 KB — anything smaller is basically silence/empty
+const SILENCE_THRESHOLD = 0.01; // RMS below this = silent (0–1 scale)
 
 interface VoiceRecorderProps {
     langKey: LangKey;
@@ -24,6 +26,10 @@ export default function VoiceRecorder({ langKey, onRecorded, onCleared, existing
     const mediaRecorderRef = useRef<MediaRecorder | null>(null);
     const chunksRef = useRef<Blob[]>([]);
     const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+    const maxTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const silenceTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+    const analyserRef = useRef<AnalyserNode | null>(null);
+    const peakRmsRef = useRef<number>(0);
     const startTimeRef = useRef<number>(0);
 
     const labels = uiLabels[langKey];
@@ -42,6 +48,14 @@ export default function VoiceRecorder({ langKey, onRecorded, onCleared, existing
             clearInterval(timerRef.current);
             timerRef.current = null;
         }
+        if (maxTimerRef.current) {
+            clearTimeout(maxTimerRef.current);
+            maxTimerRef.current = null;
+        }
+        if (silenceTimerRef.current) {
+            clearInterval(silenceTimerRef.current);
+            silenceTimerRef.current = null;
+        }
     };
 
     const startRecording = useCallback(async () => {
@@ -51,7 +65,10 @@ export default function VoiceRecorder({ langKey, onRecorded, onCleared, existing
             const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
                 ? 'audio/webm;codecs=opus'
                 : 'audio/webm';
-            const mediaRecorder = new MediaRecorder(stream, { mimeType });
+            const mediaRecorder = new MediaRecorder(stream, {
+                mimeType,
+                audioBitsPerSecond: 64000, // 64 kbps — smaller files, still good for ML
+            });
             mediaRecorderRef.current = mediaRecorder;
             chunksRef.current = [];
 
@@ -83,6 +100,14 @@ export default function VoiceRecorder({ langKey, onRecorded, onCleared, existing
                     onCleared?.();
                     return;
                 }
+                if (peakRmsRef.current < SILENCE_THRESHOLD) {
+                    setRecError('No speech detected — the recording sounds silent. Please speak clearly into the microphone and try again.');
+                    setAudioUrl(null);
+                    setIsRecording(false);
+                    setElapsed(0);
+                    onCleared?.();
+                    return;
+                }
                 // ── Accept ──────────────────────────────────────────────────
                 const url = URL.createObjectURL(blob);
                 setAudioUrl(url);
@@ -90,6 +115,24 @@ export default function VoiceRecorder({ langKey, onRecorded, onCleared, existing
                 setElapsed(0);
                 onRecorded(blob);
             };
+
+            // ── Silence detection via AnalyserNode ─────────────────────────
+            const audioCtx = new AudioContext();
+            const source = audioCtx.createMediaStreamSource(stream);
+            const analyser = audioCtx.createAnalyser();
+            analyser.fftSize = 2048;
+            source.connect(analyser);
+            analyserRef.current = analyser;
+            peakRmsRef.current = 0;
+
+            const dataArray = new Float32Array(analyser.fftSize);
+            silenceTimerRef.current = setInterval(() => {
+                analyser.getFloatTimeDomainData(dataArray);
+                const rms = Math.sqrt(
+                    dataArray.reduce((sum, v) => sum + v * v, 0) / dataArray.length
+                );
+                if (rms > peakRmsRef.current) peakRmsRef.current = rms;
+            }, 200);
 
             // Start elapsed timer
             startTimeRef.current = Date.now();
@@ -100,6 +143,13 @@ export default function VoiceRecorder({ langKey, onRecorded, onCleared, existing
 
             mediaRecorder.start(250);
             setIsRecording(true);
+
+            // ── Auto-stop at MAX_DURATION_SEC ────────────────────────────────
+            maxTimerRef.current = setTimeout(() => {
+                if (mediaRecorderRef.current?.state === 'recording') {
+                    mediaRecorderRef.current.stop();
+                }
+            }, MAX_DURATION_SEC * 1000);
         } catch (err) {
             console.error('Microphone access denied:', err);
             setRecError('Microphone access is required. Please allow microphone permission and try again.');
@@ -145,6 +195,12 @@ export default function VoiceRecorder({ langKey, onRecorded, onCleared, existing
                         <span className="timer-digits">{fmtTime(elapsed)}</span>
                         {elapsed < MIN_DURATION_SEC && (
                             <span className="timer-hint">min {MIN_DURATION_SEC}s</span>
+                        )}
+                        {elapsed >= MIN_DURATION_SEC && elapsed < MAX_DURATION_SEC && (
+                            <span className="timer-hint">{MAX_DURATION_SEC - elapsed}s left</span>
+                        )}
+                        {elapsed >= MAX_DURATION_SEC && (
+                            <span className="timer-hint" style={{ color: 'var(--color-error, #ef4444)' }}>stopping…</span>
                         )}
                     </div>
                     <button

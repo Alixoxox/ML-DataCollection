@@ -33,15 +33,7 @@ function AlreadyParticipated({ onReset }: { onReset: () => void }) {
                 <span className="already-thanks-icon" aria-hidden="true">💙</span>
                 Thank you for helping advance mood detection research!
             </div>
-            {/* Escape hatch for testers / researchers */}
-            <button
-                type="button"
-                className="btn-already-reset"
-                onClick={onReset}
-                aria-label="Submit again (for testing only)"
-            >
-                Submit again (testing only)
-            </button>
+
         </div>
     );
 }
