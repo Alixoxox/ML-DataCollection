@@ -67,7 +67,7 @@ export default function VoiceRecorder({ langKey, onRecorded, onCleared, existing
                 : 'audio/webm';
             const mediaRecorder = new MediaRecorder(stream, {
                 mimeType,
-                audioBitsPerSecond: 64000, // 64 kbps — smaller files, still good for ML
+                audioBitsPerSecond: 96000, // 96 kbps — smaller files, still good for ML
             });
             mediaRecorderRef.current = mediaRecorder;
             chunksRef.current = [];
