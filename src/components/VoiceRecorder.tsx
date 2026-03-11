@@ -3,8 +3,8 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { uiLabels, type LangKey } from '@/lib/i18n';
 
-const MIN_DURATION_SEC = 5;   // reject recordings shorter than this
-const MAX_DURATION_SEC = 30;  // auto-stop at this limit for consistent ML clips
+const MIN_DURATION_SEC = 3;   // reject recordings shorter than this
+const MAX_DURATION_SEC = 20;  // auto-stop at this limit for consistent ML clips
 const MIN_BLOB_BYTES = 4096; // ~4 KB — anything smaller is basically silence/empty
 const SILENCE_THRESHOLD = 0.01; // RMS below this = silent (0–1 scale)
 
