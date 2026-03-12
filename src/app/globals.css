@@ -957,18 +957,156 @@ details[open] .dataset-summary::after { transform: rotate(180deg); }
    SUCCESS SCREEN
    ============================================================ */
 .success-screen {
+  position: relative;
+  overflow: hidden;
   text-align: center;
-  padding: 64px 40px;
+  padding: 64px 40px 52px;
   background: var(--color-surface);
-  border: 1px solid var(--color-border-light);
+  border: 1px solid rgba(16,185,129,0.25);
+  border-top: 3px solid var(--color-success);
   border-radius: var(--radius-2xl);
-  box-shadow: var(--shadow-md), 0 0 40px rgba(16,185,129,0.1);
-  animation: slideUp 0.5s cubic-bezier(0.16,1,0.3,1) forwards;
+  box-shadow: var(--shadow-md), 0 0 60px rgba(16,185,129,0.08);
+  animation: slideUp 0.55s cubic-bezier(0.16,1,0.3,1) forwards;
 }
-.success-icon { font-size: 4rem; display: block; margin-bottom: 20px; animation: float 3s ease-in-out infinite; }
-.success-title { font-size: 2rem; font-weight: 800; color: var(--color-success); margin-bottom: 14px; letter-spacing: -0.02em; }
-.success-msg { font-size: 1rem; color: var(--color-text-muted); max-width: 400px; margin: 0 auto 14px; line-height: 1.7; }
-.success-sub { font-size: 0.9rem; color: var(--color-text-dim); }
+
+/* Decorative background orbs */
+.success-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  pointer-events: none;
+  opacity: 0.18;
+  animation: orbDrift 8s ease-in-out infinite alternate;
+}
+.success-orb-1 { width: 260px; height: 260px; background: radial-gradient(circle, #10b981, transparent); top: -80px; right: -60px; animation-delay: 0s; }
+.success-orb-2 { width: 200px; height: 200px; background: radial-gradient(circle, #6366f1, transparent); bottom: -60px; left: -40px; animation-delay: -3s; }
+.success-orb-3 { width: 150px; height: 150px; background: radial-gradient(circle, #06b6d4, transparent); bottom: 60px; right: 30px; animation-delay: -6s; }
+@keyframes orbDrift {
+  from { transform: translate(0, 0) scale(1); }
+  to   { transform: translate(20px, 15px) scale(1.08); }
+}
+
+/* Animated SVG checkmark */
+.success-check-wrap {
+  width: 88px;
+  height: 88px;
+  margin: 0 auto 28px;
+  filter: drop-shadow(0 0 18px rgba(16,185,129,0.45));
+}
+.success-check-svg { width: 100%; height: 100%; }
+.success-check-circle {
+  stroke: var(--color-success);
+  stroke-width: 2;
+  fill: rgba(16,185,129,0.1);
+  stroke-dasharray: 166;
+  stroke-dashoffset: 166;
+  stroke-linecap: round;
+  animation: drawCircle 0.6s cubic-bezier(0.65,0,0.45,1) 0.1s forwards;
+}
+.success-check-tick {
+  stroke: var(--color-success);
+  stroke-width: 3;
+  fill: none;
+  stroke-dasharray: 48;
+  stroke-dashoffset: 48;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  animation: drawTick 0.4s cubic-bezier(0.65,0,0.45,1) 0.65s forwards;
+}
+@keyframes drawCircle {
+  to { stroke-dashoffset: 0; }
+}
+@keyframes drawTick {
+  to { stroke-dashoffset: 0; }
+}
+
+.success-title {
+  font-size: 1.9rem;
+  font-weight: 800;
+  color: var(--color-text);
+  margin-bottom: 12px;
+  letter-spacing: -0.025em;
+  position: relative;
+}
+.success-msg {
+  font-size: 0.97rem;
+  color: var(--color-text-muted);
+  max-width: 420px;
+  margin: 0 auto 28px;
+  line-height: 1.75;
+  position: relative;
+}
+
+/* Stat pills row */
+.success-stats {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  padding: 10px 24px;
+  margin-bottom: 24px;
+  position: relative;
+}
+.success-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 0 20px;
+}
+.success-stat-num {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--color-success);
+  line-height: 1;
+}
+.success-stat-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--color-text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+.success-stat-divider {
+  width: 1px;
+  height: 32px;
+  background: var(--color-border);
+  flex-shrink: 0;
+}
+
+.success-sub {
+  font-size: 0.9rem;
+  color: var(--color-text-dim);
+  margin-bottom: 4px;
+  position: relative;
+}
+
+.submit-another-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 28px;
+  padding: 10px 22px;
+  background: transparent;
+  border: 1.5px solid var(--color-border-light);
+  border-radius: var(--radius-full);
+  color: var(--color-text-muted);
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition);
+  position: relative;
+}
+.submit-another-btn:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  background: rgba(6,182,212,0.06);
+  transform: translateY(-1px);
+}
+
 
 /* ============================================================
    FOOTER

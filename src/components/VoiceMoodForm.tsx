@@ -19,25 +19,6 @@ interface RecordingState {
 
 const emptyRecording = (): RecordingState => ({ blob: null, mood: '' });
 
-/* ── Already Participated Screen ─────────────────────────────────────────── */
-function AlreadyParticipated({ onReset }: { onReset: () => void }) {
-    return (
-        <div className="already-screen" role="status" aria-live="polite">
-            <div className="already-icon" aria-hidden="true">🎙️</div>
-            <h2 className="already-title">Already Participated</h2>
-            <p className="already-msg">
-                It looks like you&apos;ve already contributed to this study from this device.
-                To keep the dataset meaningful, each participant is limited to one submission.
-            </p>
-            <div className="already-thanks">
-                <span className="already-thanks-icon" aria-hidden="true">💙</span>
-                Thank you for helping advance mood detection research!
-            </div>
-
-        </div>
-    );
-}
-
 /* ── Main Form ───────────────────────────────────────────────────────────── */
 export default function VoiceMoodForm() {
     const [language, setLanguage] = useState<string>('');
@@ -56,9 +37,10 @@ export default function VoiceMoodForm() {
     const { setProgress } = useFormProgress();
 
     // Check localStorage for previous submission on mount
+    // (disabled for testing — re-enable to restore deduplication)
     useEffect(() => {
-        const flag = localStorage.getItem(STORAGE_KEY);
-        if (flag) setAlreadyDone(true);
+        // const flag = localStorage.getItem(STORAGE_KEY);
+        // if (flag) setAlreadyDone(true);
         setHydrated(true);
     }, []);
 
@@ -103,14 +85,12 @@ export default function VoiceMoodForm() {
             setValidationMsg('Please select a language.');
             return false;
         }
-        // Any recording with a blob must also have a mood selected
         for (let i = 0; i < TOTAL_RECORDINGS; i++) {
             if (recordings[i].blob && !recordings[i].mood) {
                 setValidationMsg(`Please select a mood for Recording ${i + 1}.`);
                 return false;
             }
         }
-        // Need at least REQUIRED_COUNT fully-completed recordings (any slots)
         const completedCount = recordings.filter((r) => r.blob && r.mood).length;
         if (completedCount < REQUIRED_COUNT) {
             setValidationMsg(
@@ -152,7 +132,7 @@ export default function VoiceMoodForm() {
             if (!res.ok || !data.success) throw new Error(data.error || 'Submission failed.');
 
             // Mark this device as having participated
-            localStorage.setItem(STORAGE_KEY, Date.now().toString());
+            // localStorage.setItem(STORAGE_KEY, Date.now().toString());
             setSubmitted(true);
         } catch (err: unknown) {
             setError(err instanceof Error ? err.message : 'An unexpected error occurred.');
@@ -161,32 +141,73 @@ export default function VoiceMoodForm() {
         }
     };
 
-    // Clear the deduplication flag (testing escape hatch)
-    const handleReset = () => {
-        localStorage.removeItem(STORAGE_KEY);
-        setAlreadyDone(false);
+    // Reset entire form so the user can submit another response
+    const handleSubmitAnother = () => {
+        setLanguage('');
+        setScript(null);
+        setRecordings(Array.from({ length: TOTAL_RECORDINGS }, emptyRecording));
+        setConsent(false);
+        setError(null);
+        setValidationMsg(null);
+        setSubmitted(false);
     };
 
     // ── Render guards ────────────────────────────────────────────────────────
-    if (!hydrated) return null; // prevent SSR/localStorage mismatch flash
+    if (!hydrated) return null;
 
-    if (alreadyDone) return <AlreadyParticipated onReset={handleReset} />;
-
+    // ── Success Screen ───────────────────────────────────────────────────────
     if (submitted) {
+        const completedCount = recordings.filter((r) => r.blob && r.mood).length;
         return (
             <div className="success-screen" role="status" aria-live="polite">
-                <div className="success-icon" aria-hidden="true">✅</div>
-                <h2 className="success-title">Thank You!</h2>
+                {/* Animated background orbs */}
+                <div className="success-orb success-orb-1" aria-hidden="true" />
+                <div className="success-orb success-orb-2" aria-hidden="true" />
+                <div className="success-orb success-orb-3" aria-hidden="true" />
+
+                {/* SVG animated checkmark */}
+                <div className="success-check-wrap" aria-hidden="true">
+                    <svg className="success-check-svg" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle className="success-check-circle" cx="26" cy="26" r="24" />
+                        <polyline className="success-check-tick" points="14,27 22,35 38,17" />
+                    </svg>
+                </div>
+
+                <h2 className="success-title">Submission Complete</h2>
                 <p className="success-msg">
-                    Your voice recordings have been submitted successfully. Your contributions
-                    help advance mood detection research.
+                    Your voice recordings have been received. Thank you for helping
+                    build a multilingual mood detection dataset.
                 </p>
+
+                {/* Stats row */}
+                <div className="success-stats" aria-label="Submission summary">
+                    <div className="success-stat">
+                        <span className="success-stat-num">{completedCount}</span>
+                        <span className="success-stat-label">Recording{completedCount !== 1 ? 's' : ''}</span>
+                    </div>
+                    <div className="success-stat-divider" aria-hidden="true" />
+                    <div className="success-stat">
+                        <span className="success-stat-num">✓</span>
+                        <span className="success-stat-label">Saved</span>
+                    </div>
+
+                </div>
+
+                {/* Urdu thank-you */}
                 {(langKey === 'urdu_script' || langKey === 'roman_urdu') && (
                     <p className="success-sub" dir={langKey === 'urdu_script' ? 'rtl' : 'ltr'}>
                         {langKey === 'urdu_script' && 'آپ کا شکریہ! آپ کی ریکارڈنگز محفوظ کر لی گئی ہیں۔'}
                         {langKey === 'roman_urdu' && 'Shukriya! Aapki recordings save ho gayi hain.'}
                     </p>
                 )}
+
+                <button
+                    type="button"
+                    className="submit-another-btn"
+                    onClick={handleSubmitAnother}
+                >
+                    ↩&nbsp;Submit another response
+                </button>
             </div>
         );
     }
